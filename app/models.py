@@ -72,6 +72,14 @@ class PaymentMethod(str, enum.Enum):
     cash       = "CASH"
 
 
+class AnnouncementType(str, enum.Enum):
+    delay        = "DELAY"
+    cancellation = "CANCELLATION"
+    gate_change  = "GATE_CHANGE"
+    boarding     = "BOARDING"
+    general      = "GENERAL"
+
+
 # ══════════════════════════════════════════════════
 #  User
 # ══════════════════════════════════════════════════
@@ -340,6 +348,8 @@ class Announcement(Base):
     id          = Column(Integer, primary_key=True, index=True)
     flight_id   = Column(Integer, ForeignKey("flights.id", ondelete="CASCADE"),
                          nullable=False, index=True)
+    type        = Column(SAEnum(AnnouncementType),
+                         default=AnnouncementType.general, nullable=False)
     title       = Column(String(200), nullable=False)
     body        = Column(Text, nullable=True)
     created_at  = Column(DateTime(timezone=True), server_default=func.now())

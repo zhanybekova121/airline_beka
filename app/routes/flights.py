@@ -121,3 +121,37 @@ def get_seat_map(
         "total_seats":  airplane.total_seats,
         "seat_map":     seat_map,
     }
+
+
+# ──────────────────────────────────────────────────────
+#  Announcements (public, requires auth)
+# ──────────────────────────────────────────────────────
+
+@router.get(
+    "/{flight_id}/announcements",
+    summary="Get announcements for a flight",
+)
+def get_flight_announcements(
+    flight_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list:
+    """Return all announcements for a given flight, newest first."""
+    from ..models import Announcement
+    announcements = (
+        db.query(Announcement)
+        .filter(Announcement.flight_id == flight_id)
+        .order_by(Announcement.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id":         a.id,
+            "flight_id":  a.flight_id,
+            "type":       a.type.value if a.type else "GENERAL",
+            "title":      a.title,
+            "body":       a.body,
+            "created_at": a.created_at.isoformat() if a.created_at else None,
+        }
+        for a in announcements
+    ]
