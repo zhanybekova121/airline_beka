@@ -40,6 +40,8 @@ def _upsert_admin(db):
     """Return (user, created). created=True when the row was inserted now."""
     user = db.query(User).filter(User.email == ADMIN_EMAIL).first()
     if user:
+        user.hashed_password = hash_password(ADMIN_PASSWORD)
+        db.commit()
         return user, False
     user = User(
         email=ADMIN_EMAIL,
