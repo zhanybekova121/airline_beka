@@ -19,6 +19,7 @@ from .routes import flights as flights_router
 from .routes import bookings as bookings_router
 from .routes import payments as payments_router
 from .routes import admin as admin_router
+from .routes import tickets as tickets_router
 from .seed import seed_db
 
 # ──────────────────────────────────────────────────────
@@ -52,6 +53,7 @@ app.include_router(flights_router.router)
 app.include_router(bookings_router.router)
 app.include_router(payments_router.router)
 app.include_router(admin_router.router)
+app.include_router(tickets_router.router)
 
 # ──────────────────────────────────────────────────────
 #  Startup
