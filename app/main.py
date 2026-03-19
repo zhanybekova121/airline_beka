@@ -12,6 +12,7 @@ All endpoints live in routes/.
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text, inspect
 
 from .database import Base, engine, get_db
 from .routes import auth as auth_router
@@ -59,10 +60,27 @@ app.include_router(tickets_router.router)
 #  Startup
 # ──────────────────────────────────────────────────────
 
+def run_migrations():
+    with engine.connect() as conn:
+        # Check if 'type' column exists in announcements
+        inspector = inspect(engine)
+        if 'announcements' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('announcements')]
+            
+            if 'type' not in columns:
+                conn.execute(text(
+                    "ALTER TABLE announcements ADD COLUMN type VARCHAR DEFAULT 'general'"
+                ))
+                conn.commit()
+                print("✅ Migration: added 'type' column to announcements table")
+            else:
+                print("✅ Migration: 'type' column already exists")
+
 @app.on_event("startup")
 def on_startup() -> None:
     """Create all DB tables and populate seed data on first launch."""
     Base.metadata.create_all(bind=engine)
+    run_migrations()
     db = next(get_db())
     try:
         seed_db(db)
