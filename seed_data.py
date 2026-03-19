@@ -93,21 +93,37 @@ def _upsert_airports(db):
 
 def _upsert_airplanes(db):
     """Insert airplanes that don't exist yet. Returns (planes_dict, new_count)."""
+    def make_map(biz_end, legroom_end, econ_end):
+        sm = {}
+        cols = ['A', 'B', 'C', 'D', 'E', 'F']
+        for r in range(1, biz_end + 1):
+            for c in cols: sm[f"{r}{c}"] = {"category": "business", "available": True}
+        for r in range(biz_end + 1, legroom_end + 1):
+            for c in cols: sm[f"{r}{c}"] = {"category": "extra_legroom", "available": True}
+        for r in range(legroom_end + 1, econ_end + 1):
+            for c in cols: sm[f"{r}{c}"] = {"category": "economy", "available": True}
+        return sm
+
     plane_data = [
         dict(registration="TC-JFA", model="Boeing 737-800",   manufacturer="Boeing",
-             total_seats=162, economy_seats=138, business_seats=24,  first_seats=0,  seat_map={}),
+             total_seats=162, economy_seats=138, business_seats=24,  first_seats=0,  
+             seat_map=make_map(4, 8, 27)),
         dict(registration="D-AIWA", model="Airbus A321neo",   manufacturer="Airbus",
-             total_seats=194, economy_seats=165, business_seats=25,  first_seats=4,  seat_map={}),
+             total_seats=194, economy_seats=165, business_seats=25,  first_seats=4,  
+             seat_map=make_map(4, 9, 32)),
         dict(registration="G-STBA", model="Boeing 787-9",     manufacturer="Boeing",
-             total_seats=296, economy_seats=232, business_seats=48,  first_seats=16, seat_map={}),
+             total_seats=296, economy_seats=232, business_seats=48,  first_seats=16, 
+             seat_map=make_map(8, 16, 48)),
     ]
     new_count = 0
     for d in plane_data:
-        if not db.query(Airplane).filter(Airplane.registration == d["registration"]).first():
+        existing = db.query(Airplane).filter(Airplane.registration == d["registration"]).first()
+        if not existing:
             db.add(Airplane(**d))
             new_count += 1
-    if new_count:
-        db.commit()
+        else:
+            existing.seat_map = d["seat_map"]
+    db.commit()
 
     regs = [d["registration"] for d in plane_data]
     planes = {
