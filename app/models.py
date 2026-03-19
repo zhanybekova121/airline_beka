@@ -73,11 +73,11 @@ class PaymentMethod(str, enum.Enum):
 
 
 class AnnouncementType(str, enum.Enum):
-    delay        = "DELAY"
-    cancellation = "CANCELLATION"
-    gate_change  = "GATE_CHANGE"
-    boarding     = "BOARDING"
-    general      = "GENERAL"
+    delay        = "delay"
+    cancellation = "cancellation"
+    gate_change  = "gate_change"
+    boarding     = "boarding"
+    general      = "general"
 
 
 # ══════════════════════════════════════════════════

@@ -59,11 +59,11 @@ class PaymentMethod(str, Enum):
 
 
 class AnnouncementType(str, Enum):
-    delay        = "DELAY"
-    cancellation = "CANCELLATION"
-    gate_change  = "GATE_CHANGE"
-    boarding     = "BOARDING"
-    general      = "GENERAL"
+    delay        = "delay"
+    cancellation = "cancellation"
+    gate_change  = "gate_change"
+    boarding     = "boarding"
+    general      = "general"
 
 
 # ══════════════════════════════════════════════════
@@ -293,7 +293,7 @@ class AnnouncementCreate(BaseModel):
     flight_id: int
     type:      AnnouncementType = AnnouncementType.general
     title:     str
-    body:      Optional[str] = None
+    message:   str
 
 
 class TicketOut(BaseModel):

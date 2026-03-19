@@ -59,7 +59,9 @@ def update_flight_status(flight_id: int, status: FlightStatus, db: Session):
 
 def create_announcement(payload: AnnouncementCreate, db: Session):
     """Create an announcement for a flight."""
-    announcement = Announcement(**payload.dict())
+    data = payload.dict()
+    data["body"] = data.pop("message", None)
+    announcement = Announcement(**data)
     db.add(announcement)
     db.commit()
     db.refresh(announcement)
